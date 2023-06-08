@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pia-wg"
+version = "0.1.0"
+description = ""
+authors = ["Zachary Juang <zachary822@me.com>"]
+readme = "README.md"
+packages = [{include = "pia_wg"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.31.0"
+requests-toolbelt = "^1.0.0"
+urllib3 = "^2.0.3"
+pick = "^2.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
