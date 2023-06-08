@@ -4,9 +4,9 @@ from getpass import getpass
 import requests
 from pick import pick
 
-from piawg import piawg
+from piawg import PiaWg
 
-pia = piawg()
+pia = PiaWg()
 
 # Generate public and private key pair
 pia.generate_keys()

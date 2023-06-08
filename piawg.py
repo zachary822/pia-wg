@@ -1,12 +1,11 @@
 import json
 import subprocess
-import urllib.parse
 
 import requests
 from requests_toolbelt.adapters import host_header_ssl
 
 
-class piawg:
+class PiaWg:
     def __init__(self):
         self.server_list = {}
         self.get_server_list()
@@ -38,7 +37,7 @@ class piawg:
             s.verify = "ca.rsa.4096.crt"
 
             r = s.get(
-                "https://{}/authv3/generateToken".format(meta_ip),
+                f"https://{meta_ip}/authv3/generateToken",
                 headers={"Host": meta_cn},
                 auth=(username, password),
             )
@@ -66,11 +65,8 @@ class piawg:
             s.verify = "ca.rsa.4096.crt"
 
             r = s.get(
-                "https://{}:1337/addKey?pt={}&pubkey={}".format(
-                    ip,
-                    urllib.parse.quote(self.token),
-                    urllib.parse.quote(self.publickey),
-                ),
+                f"https://{ip}:1337/addKey",
+                params={"pt": self.token, "pubkey": self.publickey},
                 headers={"Host": cn},
             )
             r.raise_for_status()
