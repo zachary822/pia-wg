@@ -1,8 +1,11 @@
 from datetime import datetime
 from getpass import getpass
+from operator import itemgetter
 
 import requests
-from pick import pick
+from pick import Option, pick
+from scapy.layers.inet import ICMP, IP
+from scapy.sendrecv import sr
 
 from piawg import PiaWg
 
@@ -14,9 +17,25 @@ pia.generate_keys()
 
 # Select region
 title = "Please choose a region: "
-options = sorted(pia.server_list.keys())
+
+server_ips = {
+    c["ip"]: n for n, s in pia.server_list.items() for c in s["servers"]["wg"]
+}
+print("checking response times...")
+ans, unans = sr([IP(dst=ip) / ICMP() for ip in server_ips], timeout=5, retry=3)
+
+region_time = sorted(
+    (
+        (server_ips[a.query.dst], (a.answer.time - a.query.sent_time) * 1000)
+        for a in ans
+    ),
+    key=itemgetter(1),
+)
+
+options = [Option(label=f"{r[0]} ({r[1]:.1f}ms)", value=r[0]) for r in region_time]
+
 option, index = pick(options, title)
-pia.set_region(option)
+pia.set_region(option.value)
 print("Selected '{}'".format(option))
 
 # Get token
