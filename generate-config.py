@@ -7,6 +7,7 @@ from pick import pick
 from piawg import PiaWg
 
 pia = PiaWg()
+pia.download_cert()
 
 # Generate public and private key pair
 pia.generate_keys()

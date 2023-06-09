@@ -1,8 +1,12 @@
 import json
 import subprocess
+from pathlib import Path
 
 import requests
 from requests_toolbelt.adapters import host_header_ssl
+
+CERT_URL = "http://www.privateinternetaccess.com/openvpn/ca.rsa.4096.crt"
+CERT_PATH = Path("ca.rsa.4096.crt")
 
 
 class PiaWg:
@@ -14,6 +18,17 @@ class PiaWg:
         self.publickey = None
         self.privatekey = None
         self.connection = None
+        self.cert = None
+
+    def download_cert(self):
+        if CERT_PATH.exists():
+            return
+        r = requests.get(CERT_URL, stream=True)
+        r.raise_for_status()
+
+        with open(CERT_PATH, "wb") as f:
+            for chunk in r.iter_content():
+                f.write(chunk)
 
     def get_server_list(self):
         r = requests.get("https://serverlist.piaservers.net/vpninfo/servers/v4")
