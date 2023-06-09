@@ -35,21 +35,9 @@ pia.addkey()
 print("Added key to server!")
 
 # Build config
-timestamp = int(datetime.now().timestamp())
 location = pia.region.replace(" ", "-")
-config_file = "PIA-{}-{}.conf".format(location, timestamp)
+config_file = "PIA-{}-{:%Y%m%dT%H%M%S}.conf".format(location, datetime.now())
 print("Saving configuration file {}".format(config_file))
-with open(config_file, "w") as file:
-    file.write("[Interface]\n")
-    file.write("Address = {}\n".format(pia.connection["peer_ip"]))
-    file.write("PrivateKey = {}\n".format(pia.privatekey))
-    file.write(
-        "DNS = {},{}\n\n".format(
-            pia.connection["dns_servers"][0], pia.connection["dns_servers"][1]
-        )
-    )
-    file.write("[Peer]\n")
-    file.write("PublicKey = {}\n".format(pia.connection["server_key"]))
-    file.write("Endpoint = {}:1337\n".format(pia.connection["server_ip"]))
-    file.write("AllowedIPs = 0.0.0.0/0\n")
-    file.write("PersistentKeepalive = 25\n")
+
+with open(config_file, "w") as f:
+    f.write(pia.generate_conf())

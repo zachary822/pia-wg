@@ -1,6 +1,7 @@
 import json
 import subprocess
 from pathlib import Path
+from importlib import resources
 
 import requests
 from requests_toolbelt.adapters import host_header_ssl
@@ -86,3 +87,16 @@ class PiaWg:
             )
             r.raise_for_status()
             self.connection = r.json()
+
+    def generate_conf(self):
+        with resources.as_file(
+            resources.files("piawg") / "wg.conf.template"
+        ) as p, open(p) as g:
+            template = g.read()
+        return template.format(
+            if_addr=self.connection["peer_ip"],
+            private_key=self.privatekey,
+            dns=",".join(self.connection["dns_servers"]),
+            public_key=self.connection["server_key"],
+            endpoint=f'{self.connection["server_ip"]}:1337',
+        )

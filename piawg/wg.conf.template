@@ -1,0 +1,10 @@
+[Interface]
+Address = {if_addr}
+PrivateKey = {private_key}
+DNS = {dns}
+
+[Peer]
+PublicKey = {public_key}
+Endpoint = {endpoint}
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
