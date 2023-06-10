@@ -12,6 +12,7 @@ requests = "^2.31.0"
 requests-toolbelt = "^1.0.0"
 pick = "^2.2.0"
 scapy = "^2.5.0"
+pydantic = {extras = ["dotenv"], version = "^1.10.9"}
 
 
 [build-system]

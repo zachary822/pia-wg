@@ -1,6 +1,7 @@
 from datetime import datetime
 from getpass import getpass
 from operator import itemgetter
+from pydantic import ValidationError
 
 import requests
 from pick import Option, pick
@@ -8,9 +9,9 @@ from scapy.layers.inet import ICMP, IP
 from scapy.sendrecv import sr
 
 from piawg import PiaWg
+from piawg.settings import Settings
 
 pia = PiaWg()
-pia.download_cert()
 
 # Generate public and private key pair
 pia.generate_keys()
@@ -36,21 +37,29 @@ options = [Option(label=f"{r[0]} ({r[1]:.1f}ms)", value=r[0]) for r in region_ti
 
 option, index = pick(options, title)
 pia.set_region(option.value)
-print("Selected '{}'".format(option))
+print(f"Selected '{option.value}'")
 
-# Get token
-while True:
-    username = input("\nEnter PIA username: ")
-    password = getpass()
-    try:
-        pia.get_token(username, password)
-        print("Login successful!")
-        break
-    except requests.HTTPError:
-        print("Error logging in, please try again...")
+
+try:
+    settings = Settings()
+
+    username = settings.PIA_USERNAME
+    password = settings.PIA_PASSWD
+    pia.get_token(username, password.get_secret_value())
+    print("Login successful!")
+except ValidationError:
+    while True:
+        username = input("Enter PIA username: ")
+        password = getpass()
+        try:
+            pia.get_token(username, password)
+            print("Login successful!")
+            break
+        except requests.HTTPError:
+            print("Error logging in, please try again...")
 
 # Add key
-pia.addkey()
+pia.add_key()
 print("Added key to server!")
 
 # Build config
